@@ -18,6 +18,8 @@ dependencies:
   http: ^0.13.4
   flutter_html: ^2.1.5
   intl: ^0.17.0
+  google_mobile_ads: ^0.13.6
+  cloud_firestore: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -44,4 +46,3 @@ flutter:
           weight: 500
         - asset: fonts/OpenSans-Regular.ttf
           weight: 400
-  #

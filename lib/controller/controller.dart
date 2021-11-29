@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,8 +10,17 @@ import 'package:the_fast_paraphrase/view/widgets/notifications.dart';
 
 class Controller extends GetxController {
   SharedPreferences? preferences;
-  RxBool isPhone = true.obs;
+  RxBool isPhone = false.obs;
   RxDouble size = 0.0.obs;
+
+  RxString userName=''.obs;
+  RxString password=''.obs;
+  RxString aboutUs=''.obs;
+  RxString phoneNumber=''.obs;
+  RxString address=''.obs;
+  RxString email=''.obs;
+  RxString website=''.obs;
+  RxBool enableAdmob=true.obs;
 
   @override
   void onInit() {
@@ -26,6 +36,7 @@ class Controller extends GetxController {
     } else {
       size(MediaQuery.of(Get.context!).size.height);
     }
+    getAdmin();
     Future.delayed(const Duration(seconds: 5)).then((value) => Get.offAll(()=> const HomePage()));
   }
 
@@ -50,6 +61,34 @@ class Controller extends GetxController {
     } catch(error){
       showToast(error.toString());
       return null;
+    }
+  }
+
+  Future<bool> getAdmin()async{
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Admin').get();
+      final List<QueryDocumentSnapshot> user = snapshot.docs;
+      if(user.isNotEmpty){
+        password(user[0].get('password'));
+        userName(user[0].get('userName'));
+        email(user[0].get('email'));
+        address(user[0].get('address'));
+        phoneNumber(user[0].get('phoneNumber'));
+        website(user[0].get('website'));
+        aboutUs(user[0].get('aboutUs'));
+        enableAdmob(user[0].get('enableAdmob'));
+        update();
+        print('Admob: ${enableAdmob.value}');
+        return true;
+      }else{
+        return false;
+      }
+    } on SocketException{
+      showToast('No Internet Connection !');
+      return false;
+    } catch(error){
+      showToast(error.toString());
+      return false;
     }
   }
 }
