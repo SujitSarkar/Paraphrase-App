@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:the_fast_paraphrase/controller/ad_controller.dart';
 import 'package:the_fast_paraphrase/controller/controller.dart';
 import 'package:the_fast_paraphrase/variables/st_variables.dart';
 
@@ -14,6 +16,7 @@ class ContactInfo extends StatefulWidget {
 class _ContactInfoState extends State<ContactInfo> {
   int _counter=0;
   bool _isLoading=false;
+  AdController adController = AdController();
 
   void _customInit(Controller controller)async{
     _counter++;
@@ -25,12 +28,29 @@ class _ContactInfoState extends State<ContactInfo> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final Controller controller=Get.find();
+    if(controller.enableAdmob.value){
+      adController.loadBannerAdd();
+      adController.loadInterstitialAd();
+    }
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    final Controller controller=Get.find();
+    if(controller.enableAdmob.value){
+      adController.showInterstitialAd();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<Controller>(
         builder: (controller) {
           final double size = controller.size.value;
           if(_counter==0) _customInit(controller);
-
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
@@ -39,11 +59,10 @@ class _ContactInfoState extends State<ContactInfo> {
             ),
             body: _isLoading
                 ? Center(child: SpinKitRipple(color: Theme.of(context).primaryColor, size: 100.0),)
-                :Center(
-                  child: SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(parent: NeverScrollableScrollPhysics()),
-              child: Padding(
+                :Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 10.0),
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -73,9 +92,15 @@ class _ContactInfoState extends State<ContactInfo> {
                       controller.website.value.isNotEmpty?SizedBox(height: size*.04):Container(),
                     ],
                   )
-              ),
-            ),
                 ),
+            floatingActionButton: controller.enableAdmob.value
+                ?Container(
+              alignment: Alignment.center,
+              child: AdWidget(ad: adController.bannerAd!),
+              width: MediaQuery.of(context).size.width,
+              height: adController.bannerAd!.size.height.toDouble(),
+            ) :Container(),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           );
         }
     );

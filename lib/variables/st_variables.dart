@@ -37,9 +37,5 @@ class StVariables{
 
   static final Color textColor = Colors.grey.shade900;
   static const String appName= 'The Fast Paraphrase';
-  static const String instructionText='This is a free, automatic article rewriter '
-      'that will rewrite any given text into readable text along. To use this'
-      ' Article Rewriter, please copy and paste your content into the text box'
-      ' below, and then click on the ‘Re-write Article’ button.';
 
 }

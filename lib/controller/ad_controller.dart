@@ -19,12 +19,12 @@ class AdController{
   BannerAd? bannerAd;
 
   static final String bannerAddUnitId=Platform.isAndroid
-      ? 'ca-app-pub-3940256099942544/6300978111'
-      : 'ca-app-pub-3940256099942544/2934735716';
+      ? 'ca-app-pub-1854594886293142/9770615093'
+      : 'ca-app-pub-1854594886293142/9383618192';
 
   static final String interstitialAddUnitId=Platform.isAndroid
-      ? 'ca-app-pub-3940256099942544/1033173712'
-      : 'ca-app-pub-3940256099942544/4411468910';
+      ? 'ca-app-pub-1854594886293142/6402231636'
+      : 'ca-app-pub-1854594886293142/2626638159';
 
   void loadBannerAdd(){
     bannerAd = BannerAd(
@@ -46,7 +46,7 @@ class AdController{
             interstitialAd = ad;
           },
           onAdFailedToLoad: (LoadAdError error) {
-            loadInterstitialAd();
+            //loadInterstitialAd();
             // print('InterstitialAd failed to load: $error');
           },
         ));

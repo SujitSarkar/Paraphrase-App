@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage> {
 
   void _customInit(Controller controller)async{
     _counter++;
-    if(controller.userName.value.isEmpty){
+    if(controller.apiKey.value.isEmpty){
       setState(()=>_isLoading=true);
       await controller.getAdmin();
       if(controller.enableAdmob.value){
@@ -72,7 +73,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return GetBuilder<Controller>(builder: (controller) {
       final double size = controller.size.value;
-      if(_counter==0) _customInit(controller);
+      if(_counter==0 || controller.apiKey.isEmpty) _customInit(controller);
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -134,8 +135,8 @@ class _HomePageState extends State<HomePage> {
                     child: AnimatedTextKit(
                       animatedTexts: [
                         ColorizeAnimatedText(
-                          StVariables.instructionText,
-                          textAlign: TextAlign.center,
+                          controller.hintText.value,
+                          textAlign: TextAlign.justify,
                           textStyle: TextStyle(
                               color: Colors.blueGrey.shade900,
                               fontSize: size * .04),
@@ -302,7 +303,17 @@ class _HomePageState extends State<HomePage> {
                         //result Field
                         Padding(
                           padding: EdgeInsets.all(size * .02),
-                          child: Html(data: _htmlResultText),
+                          child: Html(data: _htmlResultText,
+                              style: {
+                              "p": Style(
+                              fontFamily: 'openSans',
+                                textAlign: TextAlign.justify,
+                                wordSpacing: 5.0
+                              ),"b": Style(
+                                    fontFamily: 'openSans',
+                                    textAlign: TextAlign.justify,
+                                    wordSpacing: 5.0,
+                                ),}),
                         ),
                       ],
                     ),

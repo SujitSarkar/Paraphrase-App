@@ -20,6 +20,8 @@ class Controller extends GetxController {
   RxString address=''.obs;
   RxString email=''.obs;
   RxString website=''.obs;
+  RxString apiKey=''.obs;
+  RxString hintText=''.obs;
   RxBool enableAdmob=true.obs;
 
   @override
@@ -44,7 +46,7 @@ class Controller extends GetxController {
     try{
       final response = await http.post(Uri.parse('https://www.prepostseo.com/apis/checkparaphrase'),
       body: {
-        'key': '7d816829ffdc5daf36a1b9713687e19a',
+        'key': apiKey.value.toString(),
         'data': data,
         'lang': 'en'
       });
@@ -77,8 +79,9 @@ class Controller extends GetxController {
         website(user[0].get('website'));
         aboutUs(user[0].get('aboutUs'));
         enableAdmob(user[0].get('enableAdmob'));
+        apiKey(user[0].get('apiKey'));
+        hintText(user[0].get('hintText'));
         update();
-        print('Admob: ${enableAdmob.value}');
         return true;
       }else{
         return false;
