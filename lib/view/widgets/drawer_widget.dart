@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:the_fast_paraphrase/controller/controller.dart';
 import 'package:the_fast_paraphrase/view/about_page.dart';
 import 'package:the_fast_paraphrase/view/contact_info.dart';
+import 'package:launch_review/launch_review.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -63,7 +64,25 @@ class DrawerWidget extends StatelessWidget {
                   title: Text('Contact Info',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.grey.shade800,fontSize: size*.04)),
                   trailing: const Icon(CupertinoIcons.forward),
                 ),
-              )
+              ),
+              SizedBox(height: size*.04),
+
+              ///Rating
+              Container(
+                decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: const BorderRadius.all(Radius.circular(10))
+                ),
+                child: ListTile(
+                  onTap: (){
+                    LaunchReview.launch(androidAppId: 'com.glamworlditltd.the_fast_paraphrase',
+                        iOSAppId: "");
+                  },
+                  leading: Icon(CupertinoIcons.star,color: Theme.of(context).primaryColor,size: size*.07),
+                  title: Text('Rate Us',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.grey.shade800,fontSize: size*.04)),
+                  trailing: const Icon(CupertinoIcons.forward),
+                ),
+              ),
             ],
           )),
         ),
