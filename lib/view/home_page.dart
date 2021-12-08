@@ -2,8 +2,6 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -28,16 +26,19 @@ class _HomePageState extends State<HomePage> {
   AdController adController = AdController();
 
   int _sentenceCount = 0;
-  int _wordCount = 0;
-  String _htmlResultText='';
   String _resultText='';
   int _counter=0;
   bool _isLoading=false;
+  int _wordCount=0;
+  List<String> _inputWordList=[];
+  List<String> _resultWordList=[];
+  bool _editing=true;
 
   void _wordCountFunction(){
-    String s = _inputText.text;
-    List<String> l = s.split(' ');
-    setState(() => _wordCount = l.length);
+    setState((){
+      List<String> l = _inputText.text.split(' ');
+      _wordCount=l.length;
+    });
     ///Sentence Count
     final RegExp regExp = RegExp(r"[.!?;]+");
     final Iterable matches = regExp.allMatches(_inputText.text);
@@ -193,13 +194,17 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.all(size * .02),
                           child: TextFormField(
                             controller: _inputText,
+                            keyboardType: TextInputType.text,
                             textAlign: TextAlign.justify,
+                            textCapitalization: TextCapitalization.sentences,
                             validator: (value)=>value!.isEmpty?'Write or Paste Article':null,
                             onChanged: (value) {
                               _wordCountFunction();
                             },
-                            maxLines: 10,
-                            minLines: 5,
+                            onFieldSubmitted: (val){
+                              setState(()=>_editing=true);
+                            },
+                            maxLines: 6,
                             style: TextStyle(fontSize: size*.04),
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(vertical: 5.0),
@@ -264,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: size * .04),
 
                   ///Result
-                  _htmlResultText.isNotEmpty?Container(
+                  _resultText.isNotEmpty && !_editing && _inputText.text.isNotEmpty?Container(
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey),
@@ -303,17 +308,17 @@ class _HomePageState extends State<HomePage> {
                         //result Field
                         Padding(
                           padding: EdgeInsets.all(size * .02),
-                          child: Html(data: _htmlResultText,
-                              style: {
-                              "p": Style(
-                              fontFamily: 'openSans',
-                                textAlign: TextAlign.justify,
-                                wordSpacing: 5.0
-                              ),"b": Style(
-                                    fontFamily: 'openSans',
-                                    textAlign: TextAlign.justify,
-                                    wordSpacing: 5.0,
-                                ),}),
+                          child://Text(_resultText)
+                          RichText(
+                            textAlign: TextAlign.justify,
+                            text: TextSpan(
+                              style: TextStyle(
+                                  fontSize: size * .04,
+                                  fontFamily: 'openSans',
+                                  color: StVariables.textColor),
+                              children: _highlightText(),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -329,13 +334,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _validateAndSubmitQuery(Controller controller)async{
     if(_formKey.currentState!.validate()){
-     if(_sentenceCount<200 && _wordCount<5000){
-       setState(()=>_htmlResultText='');
+     if(_sentenceCount<200 &&_wordCount<5000){
        showLoadingDialog(context);
        await controller.getParaphraseResponse(_inputText.text).then((result){
          if(result!=null){
-           setState(()=>_htmlResultText=result);
-           _resultText = Bidi.stripHtmlIfNeeded(_htmlResultText);
+           setState(()=> _resultText = Bidi.stripHtmlIfNeeded(result));
+           setState(()=>_editing=false);
            Get.back();
            showToast('Complete');
            if(controller.enableAdmob.value) adController.showInterstitialAd();
@@ -351,5 +355,25 @@ class _HomePageState extends State<HomePage> {
     }else {
       showToast('Field Can\'t be empty');
     }
+  }
+
+
+  List<TextSpan> _highlightText() {
+      List<TextSpan> _textSpanChildren=[];
+      _inputWordList = _inputText.text.split(' ');
+      _resultWordList = _resultText.split(' ');
+
+      for (int i = 0; i < _resultWordList.length; i++) {
+        if (!_inputWordList.contains(_resultWordList[i])) {
+          _textSpanChildren.add(TextSpan(
+              text: '${_resultWordList[i]} ',
+              style: const TextStyle(fontWeight: FontWeight.bold)));
+        } else {
+          _textSpanChildren.add(TextSpan(
+            text: '${_resultWordList[i]} ',));
+        }
+      }
+
+    return _textSpanChildren;
   }
 }
