@@ -22,6 +22,7 @@ class Controller extends GetxController {
   RxString website=''.obs;
   RxString apiKey=''.obs;
   RxString hintText=''.obs;
+  RxString termsOfUse=''.obs;
   RxBool enableAdmob=true.obs;
 
   @override
@@ -81,6 +82,7 @@ class Controller extends GetxController {
         enableAdmob(user[0].get('enableAdmob'));
         apiKey(user[0].get('apiKey'));
         hintText(user[0].get('hintText'));
+        termsOfUse(user[0].get('termsOfUse'));
         update();
         return true;
       }else{
